@@ -3,7 +3,54 @@ const getElement = selector => document.querySelector(selector);
 
 const domain = "https://rovers.nebulum.one/api/v1/rovers";
 
+const displayRover = (roverData) => {
 
+    getElement("#options").classList.remove("hide");
+
+    getElement("#status").textContent = roverData.status;
+    getElement("#photos").textContent = roverData.total_photos;
+    getElement("#landing").textContent = roverData.landing_date
+    getElement("#max").textContent = roverData.max_date;
+
+    const yearSelect = getElement("#year");
+    yearSelect.innerHTML = "";
+    for(let i=2026; i>1999; i--) {
+        let option = document.createElement("option")
+        option.value = i;
+        option.textContent = i;
+        yearSelect.appendChild(option);
+    }
+
+    const monthSelect = getElement("#month");
+    monthSelect.innerHTML = "";
+    for(let i=1; i<=12; i++) {
+        let option = document.createElement("option")
+        option.value = i;
+        option.textContent = i;
+        monthSelect.appendChild(option);
+    }
+
+    const daySelect = getElement("#date");
+    daySelect.innerHTML = "";
+    for(let i=1; i<=31; i++) {
+        let option = document.createElement("option")
+        option.value = i;
+        option.textContent = i;
+        daySelect.appendChild(option);
+    }
+
+    const cameraSelect = getElement("#camera");
+
+    const cameraData = roverData.cameras;
+
+    cameraData.forEach( camera => {
+        let option = document.createElement("option")
+        option.value = camera.name;
+        option.textContent = camera.name;
+        cameraSelect.appendChild(option)
+    })
+
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     // get rover data
@@ -21,63 +68,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         roverOption.textContent = rover.name;
         roverSelect.appendChild(roverOption);
     })
+
+    displayRover(roverList[0]);
         
-    getElement("#options").classList.remove("hide");
-
-    getElement("#status").textContent = roverList[0].status;
-    getElement("#photos").textContent = roverList[0].total_photos;
-    getElement("#landing").textContent = roverList[0].landing_date
-    getElement("#max").textContent = roverList[0].max_date;
-
-    const yearSelect = getElement("#year");
-    for(let i=2026; i>1999; i--) {
-        let option = document.createElement("option")
-        option.value = i;
-        option.textContent = i;
-        yearSelect.appendChild(option);
-    }
-
-    const monthSelect = getElement("#month");
-    for(let i=1; i<=12; i++) {
-        let option = document.createElement("option")
-        option.value = i;
-        option.textContent = i;
-        monthSelect.appendChild(option);
-    }
-
-    const daySelect = getElement("#date");
-    for(let i=1; i<=31; i++) {
-        let option = document.createElement("option")
-        option.value = i;
-        option.textContent = i;
-        daySelect.appendChild(option);
-    }
-
-    const cameraSelect = getElement("#camera");
-
-    const cameraData = roverList[0].cameras;
-
-    cameraData.forEach( camera => {
-        let option = document.createElement("option")
-        option.value = camera.name;
-        option.textContent = camera.name;
-        cameraSelect.appendChild(option)
-    })
-
-
-
-
-
-
-    
-
     // change event handler for Rover drop-down
     getElement("#rover").addEventListener("change", async (evt) => {
+
+        const selectedRover = roverSelect.value;
+
+        const selectedData = roverList.find( rover => rover.name === selectedRover);
+
+        displayRover(selectedData);
         
     });
 
     // click event handler for View button
     getElement("#view").addEventListener("click", async () => {
+       //domain + /Curiosity/photos/?earth_date=2024-2-19&camera=MAST_LEFT
+    
+       const requestURL = `${domain}/${roverSelect.value}/photos/?earth_date=${getElement("#year").value}-${getElement("#month").value}-${getElement("#date").value}&camera=${getElement("#camera").value}`
+       
+       const imageRequest = await fetch(requestURL);
+       const imageData = await imageRequest.json();
+
+       console.log(imageData);
+
+       const displayDiv = getElement("#display");
+       imageData.photos.forEach( photo => {
+        let image = document.createElement("img")
+        image.src = photo.img_src
+        displayDiv.appendChild(image);
+       })
         
     });
 });
