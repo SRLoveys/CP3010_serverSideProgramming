@@ -44,9 +44,29 @@ document.addEventListener("DOMContentLoaded", async() => {
         const email = getElement("#email").value;
 
         // make API POST request to add email to list
-        alert("Error: Add email not working yet.");
+        try {
+            let response = await fetch(url, {
+                method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({name, email})
+        });
+        const json = await response.json();
+        } catch(e) {
+            alert (e.message);
+        }
+
 
         // make API GET request to display updated data
+        try {
+            const response = await fetch(url);
+            const json = await response.json();
+            if (json.error)
+                alert("Server error - " + json.error.message);
+            else
+                displayEmails(json);        
+        } catch(e) {
+             alert(e.message);  
+      }
     });
 
     getElement("#delete_email").addEventListener("click", async() => {
@@ -59,8 +79,26 @@ document.addEventListener("DOMContentLoaded", async() => {
         } 
 
         // make API DELETE request to delete email from list
-        alert("Error: Delete email not working yet.");
+        try {
+            let response = await fetch(url + id, {
+                method: "DELETE"
+            });
+            const json = await response.json();
+
+        } catch(e) {
+            alert (e.message);
+        }
 
         // make API GET request to display updated data
+        try {
+            const response = await fetch(url);
+            const json = await response.json();
+            if (json.error)
+                alert("Server error - " + json.error.message);
+            else
+                displayEmails(json);        
+        } catch(e) {
+             alert(e.message);  
+      }
     });
 });
