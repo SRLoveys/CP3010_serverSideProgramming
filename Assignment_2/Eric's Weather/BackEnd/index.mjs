@@ -7,16 +7,38 @@ app.use(express.json());
 app.use(cors());
 
 const madeUpData = {
-    description: "Sunny",
-    tmperature: "3",
-    windspeed: "14 kmph"
+    "Toronto": {
+        description: "Sunny",
+        tmperature: "3",
+        windspeed: "14 kmph"
+    },
+    "Vancouver": {
+        description: "Cloudy",
+        temperature: "6",
+        windspeed: "2 kmph"
+    },
+    "Montreal": {
+        description: "Stormy",
+        temperature: "17",
+        windspeed: "20 kmph"
+    },
+    "Halifax": {
+        description: "Rainy",
+        temperature: "0",
+        windspeed: "9 kmph"
+    }
 }
 
 app.post("/api/weather", (request, response) => {
-    let selectedCity = request.body.city;
-    console.log(selectedCity);
+    let city = request.body.city;
+    console.log(city);
 
-    response.json({})
+    response.json(
+        {
+            description: madeUpData[city].description,
+            temperature: madeUpData[city].temperature,
+            windspeed: madeUpData[city].windspeed,
+        })
 })
 
 app.listen(3000, () => {
