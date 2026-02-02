@@ -6,39 +6,22 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const madeUpData = {
-    "Toronto": {
-        description: "Sunny",
-        tmperature: "3",
-        windspeed: "14 kmph"
-    },
-    "Vancouver": {
-        description: "Cloudy",
-        temperature: "6",
-        windspeed: "2 kmph"
-    },
-    "Montreal": {
-        description: "Stormy",
-        temperature: "17",
-        windspeed: "20 kmph"
-    },
-    "Halifax": {
-        description: "Rainy",
-        temperature: "0",
-        windspeed: "9 kmph"
-    }
-}
+const apiKey = "ad8ff9c1d0248c79798e040100845c10";
 
-app.post("/api/weather", (request, response) => {
-    let city = request.body.city;
-    console.log(city);
 
-    response.json(
-        {
-            description: madeUpData[city].description,
-            temperature: madeUpData[city].temperature,
-            windspeed: madeUpData[city].windspeed,
-        })
+
+app.post("/api/weather", async (request, response) => {
+    const city = request.body.city;
+    const requestURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+    const weatherRequest = await fetch(requestURL);
+    const weatherData = await weatherRequest.json();
+
+    response.json({
+        description: weatherData.weather[0].description,
+        temperature: weatherData.main.temp,
+        windspeed: weatherData.wind.speed
+    })
 })
 
 app.listen(3000, () => {
